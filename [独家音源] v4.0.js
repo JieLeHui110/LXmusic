@@ -1,5 +1,5 @@
 /*!
- * @name [独家音源]
+ * @name [桀乐惠丨独家音源 V 4.0]
  * @description 音源更新，关注微信公众号：洛雪科技
  * @version 4
  * @author 洛雪科技
