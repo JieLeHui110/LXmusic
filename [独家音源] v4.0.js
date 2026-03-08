@@ -2,7 +2,7 @@
  * @name [桀乐惠丨独家最新音源 v4.0]
  * @description 
  * @version 4
- * @author 洛雪科技
+ * @author 桀乐惠修改源
  * @repository https://github.com/lxmusics/lx-music-api-server
  */
 /**
