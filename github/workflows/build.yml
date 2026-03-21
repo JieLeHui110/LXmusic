@@ -1,0 +1,36 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+      
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+      
+      - name: Build Archive
+        run: |
+          cd ios
+          xcodebuild -workspace LxMusicMobile.xcworkspace -scheme LxMusicMobile -configuration Release archive -archivePath $PWD/build/LxMusicMobile.xcarchive
+      
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive -archivePath $PWD/build/LxMusicMobile.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
+      
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LXMusic-iPA
+          path: ios/build/*.ipa
