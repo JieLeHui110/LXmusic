@@ -1,39 +1,30 @@
 name: Build LxMusic iOS
-
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-
       - name: Install CocoaPods
-        run: sudo gem install cocoapods
-
+        run: brew install cocoapods
       - name: Pod Install
-        run: cd ios && pod install
-
-      - name: Build
+        run: cd ios && pod install --repo-update
+      - name: Build & Archive
         run: |
           cd ios
           xcodebuild -workspace LxMusicMobile.xcworkspace \
           -scheme LxMusicMobile \
           -configuration Release \
-          -archivePath $PWD/build/LxMusicMobile.xcarchive \
+          -archivePath build/LxMusicMobile.xcarchive \
           archive
-
       - name: Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
-          -archivePath $PWD/build/LxMusicMobile.xcarchive \
-          -exportOptionsPlist <(echo '{"method":"ad-hoc"}') \
-          -exportPath $PWD/build
-
+          -archivePath build/LxMusicMobile.xcarchive \
+          -exportPath build \
+          -exportOptionsPlist <(echo '{"method":"ad-hoc","signingStyle":"automatic"}')
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
