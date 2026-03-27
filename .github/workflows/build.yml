@@ -1,4 +1,5 @@
-name: Build iOS IPA
+name: Build LxMusic iOS
+
 on:
   push:
     branches: [ main ]
@@ -10,28 +11,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          npm install -g yarn
-          yarn install
-
       - name: Install CocoaPods
-        run: |
-          cd ios
-          pod install --repo-update
+        run: sudo gem install cocoapods
+
+      - name: Pod Install
+        run: cd ios && pod install
 
       - name: Build
         run: |
           cd ios
-          xcodebuild -workspace LxMusicMobile.xcworkspace -scheme LxMusicMobile -configuration Release clean build CODE_SIGNING_ALLOWED=NO
+          xcodebuild -workspace LxMusicMobile.xcworkspace \
+          -scheme LxMusicMobile \
+          -configuration Release \
+          -archivePath $PWD/build/LxMusicMobile.xcarchive \
+          archive
 
-      - name: Upload App
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive \
+          -archivePath $PWD/build/LxMusicMobile.xcarchive \
+          -exportOptionsPlist <(echo '{"method":"ad-hoc"}') \
+          -exportPath $PWD/build
+
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: LXMusic-iOS
-          path: ios/build/Release-iphoneos
+          name: LxMusic-iOS
+          path: ios/build/*.ipa
